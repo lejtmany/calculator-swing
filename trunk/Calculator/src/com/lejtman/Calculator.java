@@ -28,12 +28,12 @@ public class Calculator extends JFrame {
         ScriptEngineManager manager = new ScriptEngineManager();
         this.engine = manager.getEngineByName("js");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setSize(400, 500);
+        this.setSize(500, 600);
         this.setLayout(new BorderLayout());
         display = new JLabel(" ");
         buttonPad = new JPanel();
         addButtons();
-        buttonPad.setLayout(new GridLayout(5, 5));
+        buttonPad.setLayout(new GridLayout(4, 5));
         this.add(display, BorderLayout.NORTH);
         this.add(buttonPad, BorderLayout.CENTER);        
         this.pack();
@@ -41,7 +41,7 @@ public class Calculator extends JFrame {
     }
     
     private void addButtons() {
-        String[] operators = {"+", "-", "*", "/"};
+        String[] operators = {"+", "-", "*", "/", "."};
         for (String operator : operators) {
             addButton(operator, new StringTextAdder());
         }
