@@ -23,9 +23,11 @@ public class Calculator extends JFrame {
     JPanel buttonPad;
     String equationString = "";
     ScriptEngine engine;
+    MathExpressionParser parser;
     
     public Calculator() {
         ScriptEngineManager manager = new ScriptEngineManager();
+        parser = new MathExpressionParser();
         this.engine = manager.getEngineByName("js");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setSize(500, 600);
@@ -90,7 +92,7 @@ public class Calculator extends JFrame {
         
         @Override
         public void actionPerformed(ActionEvent e) {
-            equationString += e.getActionCommand();
+            equationString += e.getActionCommand() + " ";
             updateDisplay(equationString);
         }
         
