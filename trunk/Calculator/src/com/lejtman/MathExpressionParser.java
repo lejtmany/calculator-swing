@@ -14,11 +14,19 @@ import java.util.function.BinaryOperator;
 public class MathExpressionParser {
 
     public double parse(String expr) {
+        double num1, num2;
         String[] components = expr.split(" ");
-        double num1 = Double.parseDouble(components[0]);
-        double num2 = Double.parseDouble(components[2]);
+        if (components.length != 3) {
+            throw new IllegalArgumentException("BINARY OPS ONLY");
+        }
+        try {
+            num1 = Double.parseDouble(components[0].trim());
+            num2 = Double.parseDouble(components[2].trim());
+        } catch (NumberFormatException ex) {
+            throw new IllegalArgumentException("SYNTAX ERROR");
+        }
         BinaryOperator<Double> operation = null;
-        switch (components[1]) {
+        switch (components[1].trim()) {
             case "+":
                 operation = (a, b) -> a + b;
                 break;
@@ -29,6 +37,9 @@ public class MathExpressionParser {
                 operation = (a, b) -> a * b;
                 break;
             case "/":
+                if (num2 == 0) {
+                    throw new IllegalArgumentException("Divide by Zero Error");
+                }
                 operation = (a, b) -> a / b;
                 break;
         }
