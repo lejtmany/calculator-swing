@@ -35,7 +35,7 @@ public class Calculator extends JFrame {
         display = new JLabel(" ");
         buttonPad = new JPanel();
         addButtons();
-        buttonPad.setLayout(new GridLayout(4, 5));
+        buttonPad.setLayout(new GridLayout(5, 5));
         this.add(display, BorderLayout.NORTH);
         this.add(buttonPad, BorderLayout.CENTER);        
         this.pack();
@@ -47,14 +47,14 @@ public class Calculator extends JFrame {
         for (String operator : operators) {
             addButton(operator, new StringTextAdder());
         }
-        for (int i = 1; i < 10; i++) {
+        for (int i = 0; i < 10; i++) {
             addButton(i + "", new StringTextAdder());
         }
         addButton("C", new ActionListener() {
             
             @Override
             public void actionPerformed(ActionEvent e) {
-                equationString = " ";
+                equationString = "";
                 updateDisplay(equationString);
             }
         });
@@ -63,15 +63,16 @@ public class Calculator extends JFrame {
             
             @Override
             public void actionPerformed(ActionEvent e) {
-                try {
-                    equationString = engine.eval(equationString).toString();  
-                } catch (ScriptException ex) {
-                    equationString = "SYNTAX ERROR";
+                try{
+                Double result = parser.parse(equationString);
+                updateDisplay("" + ((result.intValue() == result)?  result.intValue() + "": result));             
+                }
+                catch(IllegalArgumentException ex){
+                    updateDisplay(ex.getMessage());                  
                 }
                 finally{
-                    updateDisplay(equationString);
-                    equationString = " ";
-                }
+                   equationString = ""; 
+                }             
             }
         }
         );
@@ -92,13 +93,24 @@ public class Calculator extends JFrame {
         
         @Override
         public void actionPerformed(ActionEvent e) {
-            equationString += e.getActionCommand() + " ";
+            if(e.getActionCommand().matches("[*+-/]")){
+                equationString += " " + e.getActionCommand() + " ";
+            }
+            else
+                equationString += e.getActionCommand();
             updateDisplay(equationString);
         }
         
     }
     
     public static void main(String[] args) {
+        String dot = ".";
+        if(dot.matches("[*+-/]"))
+                System.out.println("BAD");
+        else
+                System.out.println("GOOD");
+        
+        System.out.println();
         Calculator calc = new Calculator();
     }
     
