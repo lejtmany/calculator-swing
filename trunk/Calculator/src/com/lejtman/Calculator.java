@@ -93,7 +93,7 @@ public class Calculator extends JFrame {
         
         @Override
         public void actionPerformed(ActionEvent e) {
-            if(e.getActionCommand().matches("[*+-/]")){
+            if(e.getActionCommand().matches("[*+/-]")){
                 equationString += " " + e.getActionCommand() + " ";
             }
             else
@@ -104,13 +104,6 @@ public class Calculator extends JFrame {
     }
     
     public static void main(String[] args) {
-        String dot = ".";
-        if(dot.matches("[*+-/]"))
-                System.out.println("BAD");
-        else
-                System.out.println("GOOD");
-        
-        System.out.println();
         Calculator calc = new Calculator();
     }
     
