@@ -6,8 +6,6 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -26,9 +24,7 @@ public class Calculator extends JFrame {
     MathExpressionParser parser;
     
     public Calculator() {
-        ScriptEngineManager manager = new ScriptEngineManager();
         parser = new MathExpressionParser();
-        this.engine = manager.getEngineByName("js");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setSize(500, 600);
         this.setLayout(new BorderLayout());
