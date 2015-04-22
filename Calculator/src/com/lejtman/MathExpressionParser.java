@@ -5,6 +5,9 @@
  */
 package com.lejtman;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Scanner;
 import java.util.function.BinaryOperator;
 
 /**
@@ -13,20 +16,41 @@ import java.util.function.BinaryOperator;
  */
 public class MathExpressionParser {
 
-    public double parse(String expr) {
-        double num1, num2;
-        String[] components = expr.split(" ");
-        if (components.length != 3) {
-            throw new IllegalArgumentException("BINARY OPS ONLY");
+    public final static String NEGATIVE_SIGN = "n";
+    
+    public static double parse(String expr) {
+        List<String> tokenList = tokenizeExpression(expr);
+        doOperation(tokenList, "[*/]");
+        doOperation(tokenList, "[+-]");       
+        return Double.parseDouble(tokenList.get(0));
+    }
+
+    private static List<String> tokenizeExpression(String expr) {
+        List<String> tokenList = new LinkedList();
+        String[] tokenArray = expr.split("((?<=[*+/-])|(?=[*+/-]))");
+        for (String token : tokenArray) {
+            tokenList.add(token.replaceFirst(NEGATIVE_SIGN, "-").trim());
         }
-        try {
-            num1 = Double.parseDouble(components[0].trim());
-            num2 = Double.parseDouble(components[2].trim());
-        } catch (NumberFormatException ex) {
-            throw new IllegalArgumentException("SYNTAX ERROR");
+        return tokenList;
+    }
+
+    private static void doOperation(List<String> tokenList, String pattern) {
+        double result;
+        for (int i = 1; i < tokenList.size() - 1; i++) {
+            if (tokenList.get(i).matches(pattern)) {
+                result = parseBinaryExpression(tokenList.get(i), tokenList.get(i - 1), tokenList.get(i + 1));
+                tokenList.remove(i);
+                tokenList.remove(i);
+                tokenList.set(i - 1, result + "");
+                i = 0;
+            }
         }
+    }
+
+    private static double parseBinaryExpression(String operator, String n1, String n2) {
         BinaryOperator<Double> operation = null;
-        switch (components[1].trim()) {
+        double num1 = Double.parseDouble(n1), num2 = Double.parseDouble(n2);
+        switch (operator) {
             case "+":
                 operation = (a, b) -> a + b;
                 break;
@@ -46,7 +70,7 @@ public class MathExpressionParser {
         return evaluate(num1, num2, operation);
     }
 
-    private double evaluate(double num1, double num2, BinaryOperator<Double> operation) {
+    private static double evaluate(double num1, double num2, BinaryOperator<Double> operation) {
         return operation.apply(num1, num2);
     }
 }

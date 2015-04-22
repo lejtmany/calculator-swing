@@ -20,11 +20,9 @@ public class Calculator extends JFrame {
     private JLabel topDisplay, entryDisplay;
     private JPanel displayPanel, buttonPad;
     private String memory, lastEntry, equationString;
-    private MathExpressionParser parser;
     private boolean entryIsAnswer;
 
     public Calculator() {
-        parser = new MathExpressionParser();
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setSize(500, 600);
         this.setLayout(new BorderLayout());
@@ -198,10 +196,10 @@ public class Calculator extends JFrame {
                 String entryText = entryDisplay.getText();
                 if(entryText.trim().isEmpty())
                     return;
-                if (entryText.startsWith("-")) {
+                if (entryText.startsWith(MathExpressionParser.NEGATIVE_SIGN)) {
                     entryDisplay.setText(entryText.substring(1, entryText.length()));
                 } else {
-                    entryDisplay.setText("-" + entryText);
+                    entryDisplay.setText(MathExpressionParser.NEGATIVE_SIGN + entryText);
                 }
             }
         });
@@ -211,7 +209,7 @@ public class Calculator extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    Double result = parser.parse(equationString);
+                    Double result = MathExpressionParser.parse(equationString);
                     entryDisplay.setText("" + ((result.intValue() == result) ? result.intValue() + "" : result));
                 } catch (IllegalArgumentException ex) {
                     topDisplay.setText(ex.getMessage());
