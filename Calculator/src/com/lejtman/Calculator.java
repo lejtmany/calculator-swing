@@ -162,7 +162,7 @@ public class Calculator extends JFrame {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                topDisplay.setText(String.format("%s sqrt(%s)", topDisplay.getText(), entryDisplay.getText()));
+                topDisplay.setText(String.format("%s %s", topDisplay.getText(), MathExpressionParser.sqrt(entryDisplay.getText())));
                 entryDisplay.setText(Math.sqrt(Double.parseDouble(entryDisplay.getText())) + "");
                 lastEntry = entryDisplay.getText();
                 entryIsAnswer = true;
@@ -182,7 +182,7 @@ public class Calculator extends JFrame {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                topDisplay.setText(String.format("%s reciproc(%s)", topDisplay.getText(), entryDisplay.getText()));
+                topDisplay.setText(String.format("%s %s", topDisplay.getText(), MathExpressionParser.reciproc(entryDisplay.getText())));
                 entryDisplay.setText(1 / Double.parseDouble(entryDisplay.getText()) + "");
                 entryIsAnswer = true;
             }
@@ -194,8 +194,9 @@ public class Calculator extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String entryText = entryDisplay.getText();
-                if(entryText.trim().isEmpty())
+                if (entryText.trim().isEmpty()) {
                     return;
+                }
                 if (entryText.startsWith(MathExpressionParser.NEGATIVE_SIGN)) {
                     entryDisplay.setText(entryText.substring(1, entryText.length()));
                 } else {
