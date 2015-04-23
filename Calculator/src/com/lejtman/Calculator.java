@@ -19,7 +19,7 @@ public class Calculator extends JFrame {
 
     private JLabel topDisplay, entryDisplay;
     private JPanel displayPanel, buttonPad;
-    private String memory, lastEntry, equationString;
+    private String memory, lastEntry;
     private boolean entryIsAnswer;
 
     public Calculator() {
@@ -47,10 +47,15 @@ public class Calculator extends JFrame {
             addButton(operator, new ActionListener() {
 
                 public void actionPerformed(ActionEvent e) {
-                    topDisplay.setText(topDisplay.getText() + " " + entryDisplay.getText() + " " + e.getActionCommand());
+                    if (!entryIsAnswer) {
+                        topDisplay.setText(topDisplay.getText() + " " + entryDisplay.getText() + " " + e.getActionCommand());
+                    }
+                    if (entryIsAnswer) {
+                        topDisplay.setText(entryDisplay.getText() + " " + e.getActionCommand());
+                        entryIsAnswer = false;
+                    }
                     lastEntry = entryDisplay.getText();
                     entryDisplay.setText(" ");
-                    entryIsAnswer = false;
                 }
             });
         }
@@ -209,13 +214,14 @@ public class Calculator extends JFrame {
 
             @Override
             public void actionPerformed(ActionEvent e) {
+                topDisplay.setText(topDisplay.getText() + " " + entryDisplay.getText());
                 try {
-                    Double result = MathExpressionParser.parse(equationString);
+                    Double result = MathExpressionParser.parse(topDisplay.getText());
                     entryDisplay.setText("" + ((result.intValue() == result) ? result.intValue() + "" : result));
                 } catch (IllegalArgumentException ex) {
                     topDisplay.setText(ex.getMessage());
                 } finally {
-                    equationString = "";
+                    entryIsAnswer = true;
                 }
             }
         }
