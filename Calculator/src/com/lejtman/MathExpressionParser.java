@@ -49,6 +49,7 @@ public class MathExpressionParser {
         List<String> tokenList = new LinkedList();
         String[] tokenArray = expr.split("((?<=[*+/-])|(?=[*+/-]))");
         for (String token : tokenArray) {
+            token.replace(NEGATIVE_SIGN, "-");
             if(token.contains(sqrt))
                 token = doUnaryOperation(sqrt, token);
             if(token.contains(reciproc))
