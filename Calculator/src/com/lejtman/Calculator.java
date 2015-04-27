@@ -227,10 +227,16 @@ public class Calculator extends JFrame {
 
             @Override
             public void actionPerformed(ActionEvent e) {
+                if(entryIsAnswer){
+                    topDisplay.setText(" ");
+                    entryDisplay.setText(" ");
+                    entryIsAnswer = false;
+                }   
+                if(entryIsMidCalc){
+                    entryDisplay.setText(" ");
+                    entryIsMidCalc = false;
+                }
                 String entryText = entryDisplay.getText();
-//                if (entryText.trim().isEmpty()) {
-//                    return;
-//                }
                 if (entryText.startsWith(MathExpressionParser.NEGATIVE_SIGN)) {
                     entryDisplay.setText(entryText.substring(1, entryText.length()));
                 } else {

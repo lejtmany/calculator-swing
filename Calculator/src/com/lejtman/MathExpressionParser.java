@@ -22,6 +22,8 @@ public class MathExpressionParser {
     }
 
     public static String sqrt(String num) {
+        if(num.trim().isEmpty())
+            throw new IllegalArgumentException("No input string for square root");
         return String.format("%s(%s)", sqrt, num);
     }
 
@@ -30,6 +32,8 @@ public class MathExpressionParser {
     }
 
     public static String reciproc(String num) {
+        if(num.trim().isEmpty())
+            throw new IllegalArgumentException("No input string for reciprocal");
         return String.format("%s(%s)", reciproc, num);
     }
 
@@ -58,7 +62,7 @@ public class MathExpressionParser {
 
     private static String doUnaryOperation(String oper, String token) {
         UnaryOperator<Double> operation = null;
-        Pattern numPattern = Pattern.compile("\\(-?\\d+(\\.\\d+)?\\)");
+        Pattern numPattern = Pattern.compile("-?\\d+(\\.\\d+)?");
         Matcher matcher = numPattern.matcher(token);
         double num = 0;
         if (matcher.find()) {
