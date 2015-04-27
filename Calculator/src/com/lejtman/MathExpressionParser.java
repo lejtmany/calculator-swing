@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.lejtman;
 
 import java.util.LinkedList;
@@ -21,27 +16,27 @@ public class MathExpressionParser {
     public final static String NEGATIVE_SIGN = "\u2212";
     private final static String sqrt = "sqrt";
     private final static String reciproc = "reciproc";
-    
-    public static String sqrt(double num){
+
+    public static String sqrt(double num) {
         return String.format("%s(%f)", sqrt, num);
     }
-    
-    public static String sqrt(String num){
+
+    public static String sqrt(String num) {
         return String.format("%s(%s)", sqrt, num);
     }
-    
-    public static String reciproc(double num){
+
+    public static String reciproc(double num) {
         return String.format("%s(%f)", reciproc, num);
     }
-    
-    public static String reciproc(String num){
+
+    public static String reciproc(String num) {
         return String.format("%s(%s)", reciproc, num);
     }
-    
+
     public static double parse(String expr) {
         List<String> tokenList = tokenizeExpression(expr);
         doBinaryOperation(tokenList, "[*/]");
-        doBinaryOperation(tokenList, "[+-]");       
+        doBinaryOperation(tokenList, "[+-]");
         return Double.parseDouble(tokenList.get(0));
     }
 
@@ -49,11 +44,13 @@ public class MathExpressionParser {
         List<String> tokenList = new LinkedList();
         String[] tokenArray = expr.split("((?<=[*+/-])|(?=[*+/-]))");
         for (String token : tokenArray) {
-            token.replace(NEGATIVE_SIGN, "-");
-            if(token.contains(sqrt))
+            token = token.replace(NEGATIVE_SIGN, "-");
+            if (token.contains(sqrt)) {
                 token = doUnaryOperation(sqrt, token);
-            if(token.contains(reciproc))
+            }
+            if (token.contains(reciproc)) {
                 token = doUnaryOperation(reciproc, token);
+            }
             tokenList.add(token.replaceFirst(NEGATIVE_SIGN, "-").trim());
         }
         return tokenList;
@@ -61,26 +58,34 @@ public class MathExpressionParser {
 
     private static String doUnaryOperation(String oper, String token) {
         UnaryOperator<Double> operation = null;
-        Pattern p = Pattern.compile("-?\\d+(\\.\\d+)?");
-        Matcher m = p.matcher(token);
+        Pattern numPattern = Pattern.compile("\\(-?\\d+(\\.\\d+)?\\)");
+        Matcher matcher = numPattern.matcher(token);
         double num = 0;
-        if(m.find())
-            num = Double.parseDouble(m.group());
-        switch(oper){
+        if (matcher.find()) {
+            num = Double.parseDouble(matcher.group());
+        } else {
+            throw new IllegalArgumentException("Token must contain a number");
+        }
+
+        //check that only one number in token
+        if (matcher.find()) {
+            throw new IllegalArgumentException("Token can only contain one number");
+        }
+        switch (oper) {
             case reciproc:
                 operation = (a) -> 1 / a;
                 break;
             case sqrt:
                 operation = (a) -> Math.sqrt(a);
-                break;                
-        }       
+                break;
+        }
         return operation.apply(num) + "";
     }
-    
-    private static double reciprocal(double num){
+
+    private static double reciprocal(double num) {
         return 1 / num;
     }
-    
+
     private static void doBinaryOperation(List<String> tokenList, String pattern) {
         double result;
         for (int i = 1; i < tokenList.size() - 1; i++) {
@@ -115,5 +120,5 @@ public class MathExpressionParser {
                 break;
         }
         return operation.apply(num1, num2);
-    } 
+    }
 }

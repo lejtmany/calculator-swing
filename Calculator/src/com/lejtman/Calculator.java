@@ -74,6 +74,9 @@ public class Calculator extends JFrame {
                         entryDisplay.setText(" ");
                         topDisplay.setText(" ");
                         entryIsAnswer = false;
+                    } else if (entryIsMidCalc) {
+                        entryIsMidCalc = false;
+                        entryDisplay.setText(" ");
                     }
                     entryDisplay.setText(entryDisplay.getText() + e.getActionCommand());
                 }
@@ -89,6 +92,10 @@ public class Calculator extends JFrame {
                     topDisplay.setText(" ");
                     entryIsAnswer = false;
                 }
+                if(entryIsMidCalc){
+                    entryDisplay.setText(" ");
+                    entryIsMidCalc = false;
+                }
                 String entryText = entryDisplay.getText();
                 if (!entryText.contains(".")) {
                     entryDisplay.setText(entryText + ".");
@@ -103,6 +110,8 @@ public class Calculator extends JFrame {
                 topDisplay.setText(" ");
                 entryDisplay.setText(" ");
                 memory = "";
+                entryIsAnswer = false;
+                entryIsMidCalc = false;
             }
         });
 
@@ -111,6 +120,8 @@ public class Calculator extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 entryDisplay.setText(" ");
+                entryIsAnswer = false;
+                entryIsMidCalc = false;
             }
         });
 
@@ -170,6 +181,10 @@ public class Calculator extends JFrame {
 
             @Override
             public void actionPerformed(ActionEvent e) {
+                if(entryIsAnswer){
+                    topDisplay.setText(" ");
+                    entryIsAnswer = false;
+                }
                 String sqrtString = MathExpressionParser.sqrt(entryDisplay.getText());
                 topDisplay.setText(String.format("%s %s", topDisplay.getText(), sqrtString));
                 entryDisplay.setText(MathExpressionParser.parse(sqrtString) + "");
@@ -187,6 +202,8 @@ public class Calculator extends JFrame {
                     lastEntry = m.group();
                 }
                 entryDisplay.setText(Double.parseDouble(lastEntry) * (Double.parseDouble(entryDisplay.getText()) * .01) + "");
+                topDisplay.setText(topDisplay.getText() + " " + entryDisplay.getText());
+                entryIsMidCalc = true;
             }
         });
 
@@ -194,6 +211,10 @@ public class Calculator extends JFrame {
 
             @Override
             public void actionPerformed(ActionEvent e) {
+                if(entryIsAnswer){
+                    topDisplay.setText(" ");
+                    entryIsAnswer = false;
+                }
                 String recipString = MathExpressionParser.reciproc(entryDisplay.getText());
                 topDisplay.setText(String.format("%s %s", topDisplay.getText(), recipString));
                 entryDisplay.setText(MathExpressionParser.parse(recipString) + "");
@@ -207,9 +228,9 @@ public class Calculator extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String entryText = entryDisplay.getText();
-                if (entryText.trim().isEmpty()) {
-                    return;
-                }
+//                if (entryText.trim().isEmpty()) {
+//                    return;
+//                }
                 if (entryText.startsWith(MathExpressionParser.NEGATIVE_SIGN)) {
                     entryDisplay.setText(entryText.substring(1, entryText.length()));
                 } else {
@@ -226,8 +247,9 @@ public class Calculator extends JFrame {
                 try {
                     Double result = MathExpressionParser.parse(topDisplay.getText());
                     entryDisplay.setText("" + ((result.intValue() == result) ? result.intValue() + "" : result));
-                } catch (IllegalArgumentException ex) {
-                    topDisplay.setText(ex.getMessage());
+                } catch (Exception ex) {
+                    topDisplay.setText("ERROR");
+                    entryDisplay.setText(" ");
                 } finally {
                     entryIsAnswer = true;
                 }
