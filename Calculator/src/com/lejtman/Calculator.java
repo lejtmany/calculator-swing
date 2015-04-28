@@ -19,30 +19,22 @@ import javax.swing.JPanel;
  */
 public class Calculator extends JFrame {
 
-    //private final JLabel topDisplay, entryDisplay;
-    private final JPanel displayPanel, buttonPad;
+    private final JPanel buttonPad;
     private String memory;
-   // private boolean entryIsAnswer, entryIsMidCalc;
-    private CalendarDisplay display;
+    private final CalculatorDisplay display;
 
     public Calculator() {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setSize(500, 600);
         this.setLayout(new BorderLayout());
-        displayPanel = new JPanel(new BorderLayout());
-       // topDisplay = new JLabel(" ");
-    //    entryDisplay = new JLabel(" ");
         buttonPad = new JPanel();
         addButtons();
         buttonPad.setLayout(new GridLayout(5, 5));
-      //  displayPanel.add(topDisplay, BorderLayout.NORTH);
-       // displayPanel.add(entryDisplay, BorderLayout.CENTER);
-        this.add(displayPanel, BorderLayout.NORTH);
+        display = new CalculatorDisplay();
+        this.add(display, BorderLayout.NORTH);
         this.add(buttonPad, BorderLayout.CENTER);
         this.pack();
         this.setVisible(true);
-        display = new CalendarDisplay();
-        displayPanel.add(display, BorderLayout.NORTH);
     }
 
     private void addButtons() {
@@ -53,16 +45,12 @@ public class Calculator extends JFrame {
 
                 public void actionPerformed(ActionEvent e) {
 
-                    if (entryIsMidCalc) {
-                        topDisplay.setText(topDisplay.getText() + " " + e.getActionCommand());
-                        entryIsMidCalc = false;
-                    } else if (entryIsAnswer) {
-                        topDisplay.setText(entryDisplay.getText() + " " + e.getActionCommand());
-                        entryIsAnswer = false;
+                    if (display.isMidCalc()) {
+                        display.addToTopDisplay(" " + e.getActionCommand());
                     } else {
-                        topDisplay.setText(topDisplay.getText() + " " + entryDisplay.getText() + " " + e.getActionCommand());
+                        display.addToTopDisplay(display.getEntryDisplayText() + " " + e.getActionCommand());
                     }
-                    entryDisplay.setText(" ");
+                    display.clearEntryDisplay();
                 }
             });
         }
@@ -72,17 +60,17 @@ public class Calculator extends JFrame {
             addButton(i + "", new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    display.addToEntryDisplay(e.getActionCommand());
+                    display.submitToEntryDisplay(e.getActionCommand());
                 }
             });
         }
 
         addButton(".", new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {               
-                String entryText = display.getEntryText();
+            public void actionPerformed(ActionEvent e) {
+                String entryText = display.getEntryDisplayText();
                 if (!entryText.contains(".")) {
-                    display.addToEntryDisplay(".");
+                    display.submitToEntryDisplay(".");
                 }
             }
         });
@@ -108,7 +96,7 @@ public class Calculator extends JFrame {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                memory = display.getEntryText();
+                memory = display.getEntryDisplayText();
             }
         });
 
@@ -117,7 +105,7 @@ public class Calculator extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 DecimalFormat df = new DecimalFormat("#");
-                display.addToEntryDisplay(df.format(Double.parseDouble(memory)));
+                display.submitToEntryDisplay(df.format(Double.parseDouble(memory)));
             }
         });
 
@@ -125,7 +113,7 @@ public class Calculator extends JFrame {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                memory = Double.parseDouble(memory) + Double.parseDouble(display.getEntryText()) + "";
+                memory = Double.parseDouble(memory) + Double.parseDouble(display.getEntryDisplayText()) + "";
             }
         });
 
@@ -133,7 +121,7 @@ public class Calculator extends JFrame {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                memory = Double.parseDouble(memory) - Double.parseDouble(display.getEntryText()) + "";
+                memory = Double.parseDouble(memory) - Double.parseDouble(display.getEntryDisplayText()) + "";
             }
         });
 
@@ -150,7 +138,7 @@ public class Calculator extends JFrame {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                String entryText = display.getEntryText();
+                String entryText = display.getEntryDisplayText();
                 display.setEntryDisplay(entryText.substring(0, entryText.length() - 1));
             }
         });
@@ -160,14 +148,9 @@ public class Calculator extends JFrame {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (entryIsAnswer) {
-                    topDisplay.setText(" ");
-                    entryIsAnswer = false;
-                }
-                String sqrtString = MathExpressionParser.sqrt(entryDisplay.getText());
-                topDisplay.setText(String.format("%s %s", topDisplay.getText(), sqrtString));
-                entryDisplay.setText(MathExpressionParser.parse(sqrtString) + "");
-                entryIsMidCalc = true;
+                String sqrtString = MathExpressionParser.sqrt(display.getEntryDisplayText());
+                display.addToTopDisplay(String.format(sqrtString));
+                display.setMidCalc(MathExpressionParser.parse(sqrtString) + "");
             }
         });
 
@@ -176,13 +159,12 @@ public class Calculator extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String lastEntry = "";
-                Matcher m = Pattern.compile("(-?\\d+(\\.\\d+)?)(?!.*\\d)").matcher(topDisplay.getText());
+                Matcher m = Pattern.compile("(-?\\d+(\\.\\d+)?)(?!.*\\d)").matcher(display.getTopDisplayText());
                 if (m.find()) {
                     lastEntry = m.group();
                 }
-                entryDisplay.setText(Double.parseDouble(lastEntry) * (Double.parseDouble(entryDisplay.getText()) * .01) + "");
-                topDisplay.setText(topDisplay.getText() + " " + entryDisplay.getText());
-                entryIsMidCalc = true;
+                display.setMidCalc(Double.parseDouble(lastEntry) * (Double.parseDouble(display.getEntryDisplayText()) * .01) + "");
+                display.addToTopDisplay(display.getEntryDisplayText());
             }
         });
 
@@ -190,14 +172,9 @@ public class Calculator extends JFrame {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (entryIsAnswer) {
-                    topDisplay.setText(" ");
-                    entryIsAnswer = false;
-                }
-                String recipString = MathExpressionParser.reciproc(entryDisplay.getText());
-                topDisplay.setText(String.format("%s %s", topDisplay.getText(), recipString));
-                entryDisplay.setText(MathExpressionParser.parse(recipString) + "");
-                entryIsMidCalc = true;
+                String recipString = MathExpressionParser.reciproc(display.getEntryDisplayText());
+                display.addToTopDisplay(recipString);
+                display.setMidCalc(MathExpressionParser.parse(recipString) + "");
             }
         });
 
@@ -206,20 +183,17 @@ public class Calculator extends JFrame {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (entryIsAnswer) {
-                    topDisplay.setText(" ");
-                    entryDisplay.setText(" ");
-                    entryIsAnswer = false;
+                String entryText = display.getEntryDisplayText();
+                if (display.isAnswer()) {
+                    display.clearScreens();
                 }
-                if (entryIsMidCalc) {
-                    entryDisplay.setText(" ");
-                    entryIsMidCalc = false;
+                if (display.isMidCalc()) {
+                    display.clearEntryDisplay();
                 }
-                String entryText = entryDisplay.getText();
                 if (entryText.startsWith(MathExpressionParser.NEGATIVE_SIGN)) {
-                    entryDisplay.setText(entryText.substring(1, entryText.length()));
+                    display.setEntryDisplay(entryText.substring(1, entryText.length()));
                 } else {
-                    entryDisplay.setText(MathExpressionParser.NEGATIVE_SIGN + entryText.trim());
+                    display.setEntryDisplay(MathExpressionParser.NEGATIVE_SIGN + entryText.trim());
                 }
             }
         });
@@ -228,15 +202,12 @@ public class Calculator extends JFrame {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                topDisplay.setText(topDisplay.getText() + " " + entryDisplay.getText());
+                display.addToTopDisplay(display.getEntryDisplayText());
                 try {
-                    Double result = MathExpressionParser.parse(topDisplay.getText());
-                    entryDisplay.setText("" + ((result.intValue() == result) ? result.intValue() + "" : result));
+                    Double result = MathExpressionParser.parse(display.getTopDisplayText());
+                    display.setAnswer("" + ((result.intValue() == result) ? result.intValue() + "" : result));
                 } catch (Exception ex) {
-                    topDisplay.setText("ERROR");
-                    entryDisplay.setText(" ");
-                } finally {
-                    entryIsAnswer = true;
+                    display.displayError("ERROR");
                 }
             }
         }
@@ -250,81 +221,8 @@ public class Calculator extends JFrame {
         button.addActionListener(listener);
     }
 
-    private class CalendarDisplay extends JPanel{
-
-        private final JLabel topDisplay;
-        private final JLabel entryDisplay;
-        private boolean isMidCalc;
-        private boolean isAnswer;
-
-        public CalendarDisplay() {
-            topDisplay = new JLabel(" ");
-            entryDisplay = new JLabel(" ");
-            isMidCalc = false;
-            isAnswer = false;
-        }
-
-        public void setMidCalc(String s) {
-            entryDisplay.setText(s);
-            isMidCalc = true;
-        }
-
-        public void setAnswer(String s) {
-            entryDisplay.setText(s);
-            isAnswer = true;
-        }
-
-        public void addToTopDisplay(String s) {
-            addToDisplay(topDisplay, s);
-        }
-
-        public void addToEntryDisplay(String s) {
-           if(isAnswer){
-               clearScreens();
-               isAnswer = false;
-           }
-           else if(isMidCalc){
-               clearEntryDisplay();
-           }
-            addToDisplay(entryDisplay, s);
-        }
-        
-        public void setEntryDisplay(String s){
-            entryDisplay.setText(s);
-        }
-
-        private <T extends JLabel> void addToDisplay(T label, String s) {
-            label.setText(label.getText() + s);
-        }
-
-        public void clearScreens() {
-            clearDisplay(topDisplay);
-            clearEntryDisplay();
-            isMidCalc = false;
-            isAnswer = false;
-        }
-        
-        public void clearEntryDisplay(){
-            clearDisplay(entryDisplay);
-            isMidCalc = false;
-        }
-                      
-        private void clearDisplay(JLabel label){
-            label.setText(" ");
-        }
-
-        public void backSpaceEntryDisplay() {
-            String entryText = entryDisplay.getText();
-            entryDisplay.setText(entryText.substring(0, entryText.length() - 1));
-        }
-        
-        public String getEntryText(){
-            return entryDisplay.getText();
-        }
-
-    }
-
    
+
     public static void main(String[] args) {
         Calculator calc = new Calculator();
     }

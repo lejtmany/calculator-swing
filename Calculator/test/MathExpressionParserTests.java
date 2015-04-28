@@ -68,6 +68,4 @@ public class MathExpressionParserTests {
         }).isInstanceOf(IllegalArgumentException.class);
     }
     
-    
-
 }
