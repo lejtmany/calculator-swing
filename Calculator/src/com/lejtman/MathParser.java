@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
  *
  * @author agross11
  */
-public class MathExpressionParser {
+public class MathParser {
 
     public final static String NEGATIVE_SIGN = "\u2212";
     private final static String sqrt = "sqrt";

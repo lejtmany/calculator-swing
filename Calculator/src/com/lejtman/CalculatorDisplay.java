@@ -8,8 +8,7 @@ public class CalculatorDisplay extends JPanel {
 
     private final JLabel topDisplay;
     private final JLabel entryDisplay;
-    private boolean isMidCalc;
-    private boolean isAnswer;
+    private EntryState state;
 
     public CalculatorDisplay() {
         topDisplay = new JLabel(" ");
@@ -18,42 +17,43 @@ public class CalculatorDisplay extends JPanel {
         this.add(topDisplay, BorderLayout.NORTH);
         this.add(entryDisplay, BorderLayout.CENTER);
         this.setVisible(true);
-        isMidCalc = false;
-        isAnswer = false;
+        state = EntryState.ENTRY;
     }
 
     public void setMidCalc(String s) {
         entryDisplay.setText(s);
-        isMidCalc = true;
+        state = EntryState.MID_CALC;
     }
 
     public void setAnswer(String s) {
         entryDisplay.setText(s);
-        isAnswer = true;
+        state = EntryState.ANSWER;
     }
 
-    public void addToTopDisplay(String s) {
-        if (isAnswer) {
+    public void submitToTopDisplay(String s) {
+        if (state == EntryState.ANSWER) {
             clearScreens();
         }
         addToDisplay(topDisplay, s);
     }
+    
+    public void appendToTopDisplay(String text){
+        addToDisplay(topDisplay, text);
+    }
 
     public void submitToEntryDisplay(String s) {
-        if (isAnswer()) {
+        if (state == EntryState.ANSWER) {
             clearScreens();
-            isAnswer = false;
-        } else if (isMidCalc()) {
+        } else if (state == EntryState.MID_CALC) {
             clearEntryDisplay();
-            isMidCalc = false;
         }
         addToDisplay(entryDisplay, s);
+        state = EntryState.ENTRY;
     }
 
     public void setEntryDisplay(String s) {
         entryDisplay.setText(s);
-        isAnswer = false;
-        isMidCalc = false;
+        state = EntryState.ENTRY;
     }
 
     private <T extends JLabel> void addToDisplay(T label, String s) {
@@ -63,14 +63,12 @@ public class CalculatorDisplay extends JPanel {
     public void clearScreens() {
         clearDisplay(topDisplay);
         clearEntryDisplay();
-        isMidCalc = false;
-        isAnswer = false;
+        state = EntryState.ENTRY;
     }
 
     public void clearEntryDisplay() {
         clearDisplay(entryDisplay);
-        isMidCalc = false;
-        isAnswer = false;
+        state = EntryState.ENTRY;
     }
 
     private void clearDisplay(JLabel label) {
@@ -78,7 +76,7 @@ public class CalculatorDisplay extends JPanel {
     }
 
     public void backSpaceEntryDisplay() {
-        if (isMidCalc || isAnswer) {
+        if (state != EntryState.ENTRY) {
             return;
         }
         String entryText = entryDisplay.getText();
@@ -101,15 +99,11 @@ public class CalculatorDisplay extends JPanel {
     public void displayError(String errorMessage) {
         clearScreens();
         topDisplay.setText(errorMessage);
-        isAnswer = true;
+        state = EntryState.ENTRY;
     }
 
-    public boolean isMidCalc() {
-        return isMidCalc;
-    }
-
-    public boolean isAnswer() {
-        return isAnswer;
+    public EntryState getState() {
+        return state;
     }
 
 }
