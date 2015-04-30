@@ -10,7 +10,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 /**
@@ -20,7 +19,7 @@ import javax.swing.JPanel;
 public class Calculator extends JFrame {
 
     private final JPanel buttonPad;
-    private String memory;
+    private String memory, lastOperation;
     private final CalculatorDisplay display;
 
     public Calculator() {
@@ -44,13 +43,20 @@ public class Calculator extends JFrame {
             addButton(operator, new ActionListener() {
 
                 public void actionPerformed(ActionEvent e) {
-
-                    if (display.isMidCalc()) {
-                        display.addToTopDisplay(" " + e.getActionCommand());
-                    } else {
-                        display.addToTopDisplay(display.getEntryDisplayText() + " " + e.getActionCommand());
+                    // String tdText = display.getTopDisplayText();
+                    if (!display.isMidCalc()) {
+                        display.addToTopDisplay(display.getEntryDisplayText() + " ");
                     }
-                    display.clearEntryDisplay();
+
+                    try {
+                        if (!display.getTopDisplayText().trim().isEmpty()) {
+                            display.setMidCalc(solve(display.getTopDisplayText()));
+                        }
+                    } catch (Exception ex) {
+                        display.displayError("ERROR");
+                    }
+
+                    display.addToTopDisplay(" " + e.getActionCommand());
                 }
             });
         }
@@ -69,7 +75,7 @@ public class Calculator extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String entryText = display.getEntryDisplayText();
-                if (!entryText.contains(".")) {
+                if (!entryText.contains(".") || display.isAnswer() || display.isMidCalc()) {
                     display.submitToEntryDisplay(".");
                 }
             }
@@ -81,6 +87,7 @@ public class Calculator extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 display.clearScreens();
                 memory = "";
+                lastOperation = "";
             }
         });
 
@@ -138,8 +145,7 @@ public class Calculator extends JFrame {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                String entryText = display.getEntryDisplayText();
-                display.setEntryDisplay(entryText.substring(0, entryText.length() - 1));
+                display.backSpaceEntryDisplay();
             }
         });
 
@@ -202,10 +208,19 @@ public class Calculator extends JFrame {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                display.addToTopDisplay(display.getEntryDisplayText());
+                String topText = display.getTopDisplayText();
+                if (display.isAnswer()) {
+                    Matcher m = Pattern.compile("[*+/-]").matcher(topText);
+                    while (m.find()) {
+                        int start = m.start();
+                        lastOperation = topText.substring(m.start());
+                    }
+                    display.addToTopDisplay(lastOperation);
+                } else {
+                    display.addToTopDisplay(display.getEntryDisplayText());
+                }
                 try {
-                    Double result = MathExpressionParser.parse(display.getTopDisplayText());
-                    display.setAnswer("" + ((result.intValue() == result) ? result.intValue() + "" : result));
+                    display.setAnswer(solve(display.getTopDisplayText()));
                 } catch (Exception ex) {
                     display.displayError("ERROR");
                 }
@@ -215,13 +230,16 @@ public class Calculator extends JFrame {
 
     }
 
+    private String solve(String expr) {
+        Double result = MathExpressionParser.parse(expr);
+        return (result.intValue() == result) ? result.intValue() + "" : result + "";
+    }
+
     private void addButton(String text, ActionListener listener) {
         JButton button = new JButton(text);
         buttonPad.add(button);
         button.addActionListener(listener);
     }
-
-   
 
     public static void main(String[] args) {
         Calculator calc = new Calculator();
