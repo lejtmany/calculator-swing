@@ -7,7 +7,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 import static org.assertj.core.api.Assertions.*;
 
-public class MathExpressionParserTests {
+public class MathParserTests {
 
     @Test
     public void testParseExpression() {
@@ -18,7 +18,7 @@ public class MathExpressionParserTests {
 
     @Test
     public void testParseExpressionWithNegative() {
-        String expr = "43 + 21 - 6 *" + MathParser.NEGATIVE_SIGN + "2 + 4";
+        String expr = "43 + 21 - 6 * (-2) + 4";
         double result = MathParser.parse(expr);
         Assert.assertEquals((double) 80, result);
     }
@@ -35,9 +35,8 @@ public class MathExpressionParserTests {
         Pattern p = Pattern.compile("-?\\d+(\\.\\d+)?");
         String text = "reciproc(2.00000000000)";
         Matcher m = p.matcher(text);
-        if (m.find()) {
+        if (m.find())
             System.out.println(Double.parseDouble(text.substring(m.start(), m.end())));
-        }
     }
 
     @Test
@@ -67,5 +66,5 @@ public class MathExpressionParserTests {
             MathParser.parse("9 4");
         }).isInstanceOf(IllegalArgumentException.class);
     }
-    
+
 }

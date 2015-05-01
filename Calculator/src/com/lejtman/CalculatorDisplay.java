@@ -31,22 +31,22 @@ public class CalculatorDisplay extends JPanel {
     }
 
     public void submitToTopDisplay(String s) {
-        if (state == EntryState.ANSWER) {
+        if (state == EntryState.ANSWER)
             clearScreens();
-        }
+        if(s.startsWith("-"))
+            s = String.format("(%s)", s);
         addToDisplay(topDisplay, s);
     }
-    
-    public void appendToTopDisplay(String text){
+
+    public void appendToTopDisplay(String text) {
         addToDisplay(topDisplay, text);
     }
 
     public void submitToEntryDisplay(String s) {
-        if (state == EntryState.ANSWER) {
+        if (state == EntryState.ANSWER)
             clearScreens();
-        } else if (state == EntryState.MID_CALC) {
+        else if (state == EntryState.MID_CALC)
             clearEntryDisplay();
-        }
         addToDisplay(entryDisplay, s);
         state = EntryState.ENTRY;
     }
@@ -76,16 +76,14 @@ public class CalculatorDisplay extends JPanel {
     }
 
     public void backSpaceEntryDisplay() {
-        if (state != EntryState.ENTRY) {
+        if (state != EntryState.ENTRY)
             return;
-        }
         String entryText = entryDisplay.getText();
         //check that doesnt go to zero and collapse line
-        if (entryText.length() <= 1) {
+        if (entryText.length() <= 1)
             entryDisplay.setText(" ");
-        } else {
+        else
             entryDisplay.setText(entryText.substring(0, entryText.length() - 1));
-        }
     }
 
     public String getEntryDisplayText() {

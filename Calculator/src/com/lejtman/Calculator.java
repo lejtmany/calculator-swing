@@ -12,10 +12,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-/**
- *
- * @author lejtman
- */
+
 public class Calculator extends JFrame {
 
     private final JPanel buttonPad;
@@ -43,18 +40,12 @@ public class Calculator extends JFrame {
             addButton(operator, new ActionListener() {
 
                 public void actionPerformed(ActionEvent e) {
-                    // String tdText = display.getTopDisplayText();
-                    if (display.getState() != EntryState.MID_CALC) {
-                        display.submitToTopDisplay(display.getEntryDisplayText() + " ");
-                    }
 
-                    try {
-                        if (!display.getTopDisplayText().trim().isEmpty()) {
-                            display.setMidCalc(solve(display.getTopDisplayText()));
-                        }
-                    } catch (Exception ex) {
-                        display.displayError("ERROR");
-                    }
+                    if (display.getState() != EntryState.MID_CALC)
+                        display.submitToTopDisplay(display.getEntryDisplayText() + " ");
+
+                    if (!display.getTopDisplayText().trim().isEmpty())
+                        display.setMidCalc(solve(display.getTopDisplayText()));
 
                     display.submitToTopDisplay(" " + e.getActionCommand());
                 }
@@ -75,11 +66,8 @@ public class Calculator extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String entryText = display.getEntryDisplayText();
-                if (entryText.contains(".") && display.getState() == EntryState.ENTRY) {
-                    //do nothing
-                } else {
+                if (!entryText.contains(".") || display.getState() != EntryState.ENTRY)
                     display.submitToEntryDisplay(".");
-                }
             }
         });
 
@@ -168,9 +156,8 @@ public class Calculator extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 String lastEntry = "";
                 Matcher m = Pattern.compile("(-?\\d+(\\.\\d+)?)(?!.*\\d)").matcher(display.getTopDisplayText());
-                if (m.find()) {
+                if (m.find())
                     lastEntry = m.group();
-                }
                 display.setMidCalc(Double.parseDouble(lastEntry) * (Double.parseDouble(display.getEntryDisplayText()) * .01) + "");
                 display.submitToTopDisplay(display.getEntryDisplayText());
             }
@@ -191,18 +178,19 @@ public class Calculator extends JFrame {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                String entryText = display.getEntryDisplayText();
-                if (display.getState() == EntryState.ANSWER) {
+                if (display.getState() == EntryState.ANSWER)
                     display.clearScreens();
-                }
-                if (display.getState() == EntryState.MID_CALC) {
+                if (display.getState() == EntryState.MID_CALC)
                     display.clearEntryDisplay();
-                }
-                if (entryText.startsWith(MathParser.NEGATIVE_SIGN)) {
+
+                toggleNegative(display.getEntryDisplayText());
+            }
+
+            private void toggleNegative(String entryText) {
+                if (entryText.startsWith("-"))
                     display.setEntryDisplay(entryText.substring(1, entryText.length()));
-                } else {
-                    display.setEntryDisplay(MathParser.NEGATIVE_SIGN + entryText.trim());
-                }
+                else
+                    display.setEntryDisplay("-"+ entryText.trim());
             }
         });
 
@@ -211,16 +199,12 @@ public class Calculator extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String topText = display.getTopDisplayText();
-                if (display.getState() == EntryState.ANSWER) {
+                if (display.getState() == EntryState.ANSWER)
                     appendLastOperation(topText);
-                } else {
+                else
                     display.submitToTopDisplay(display.getEntryDisplayText());
-                }
-                try {
-                    display.setAnswer(solve(display.getTopDisplayText()));
-                } catch (Exception ex) {
-                    display.displayError("ERROR");
-                }
+
+                display.setAnswer(solve(display.getTopDisplayText()));
             }
 
             private void appendLastOperation(String topText) {
@@ -230,6 +214,7 @@ public class Calculator extends JFrame {
                     lastOperation = topText.substring(m.start());
                 }
                 display.appendToTopDisplay(lastOperation);
+
             }
         }
         );
@@ -237,7 +222,12 @@ public class Calculator extends JFrame {
     }
 
     private String solve(String expr) {
-        Double result = MathParser.parse(expr);
+        Double result = null;
+        try {
+            result = MathParser.parse(expr);
+        } catch (Exception ex) {
+            display.displayError("ERROR");
+        }
         return (result.intValue() == result) ? result.intValue() + "" : result + "";
     }
 
