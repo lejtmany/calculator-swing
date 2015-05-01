@@ -7,13 +7,9 @@ import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- *
- * @author agross11
- */
 public class MathParser {
 
-    public final static String NEGATIVE_SIGN = "\u2212";
+    //public final static String NEGATIVE_SIGN = "\u2212";
     private final static String sqrt = "sqrt";
     private final static String reciproc = "reciproc";
 
@@ -22,7 +18,7 @@ public class MathParser {
     }
 
     public static String sqrt(String num) {
-        if(num.trim().isEmpty())
+        if (num.trim().isEmpty())
             throw new IllegalArgumentException("No input string for square root");
         return String.format("%s(%s)", sqrt, num);
     }
@@ -32,7 +28,7 @@ public class MathParser {
     }
 
     public static String reciproc(String num) {
-        if(num.trim().isEmpty())
+        if (num.trim().isEmpty())
             throw new IllegalArgumentException("No input string for reciprocal");
         return String.format("%s(%s)", reciproc, num);
     }
@@ -46,16 +42,15 @@ public class MathParser {
 
     private static List<String> tokenizeExpression(String expr) {
         List<String> tokenList = new LinkedList();
-        String[] tokenArray = expr.split("((?<=[*+/-])|(?=[*+/-]))");
+        String[] tokenArray = expr.split("((?<=[*+/(?<!\\()-])|(?=[*+/(?<!\\()-]))");
         for (String token : tokenArray) {
-            token = token.replace(NEGATIVE_SIGN, "-");
-            if (token.contains(sqrt)) {
+            //token = token.replace(NEGATIVE_SIGN, "-");
+            if (token.contains(sqrt))
                 token = doUnaryOperation(sqrt, token);
-            }
-            if (token.contains(reciproc)) {
+            if (token.contains(reciproc))
                 token = doUnaryOperation(reciproc, token);
-            }
-            tokenList.add(token.replaceFirst(NEGATIVE_SIGN, "-").trim());
+           // tokenList.add(token.replaceFirst(NEGATIVE_SIGN, "-").trim());
+            tokenList.add(token.trim());
         }
         return tokenList;
     }
@@ -65,16 +60,14 @@ public class MathParser {
         Pattern numPattern = Pattern.compile("-?\\d+(\\.\\d+)?");
         Matcher matcher = numPattern.matcher(token);
         double num = 0;
-        if (matcher.find()) {
+        if (matcher.find())
             num = Double.parseDouble(matcher.group());
-        } else {
+        else
             throw new IllegalArgumentException("Token must contain a number");
-        }
 
         //check that only one number in token
-        if (matcher.find()) {
+        if (matcher.find())
             throw new IllegalArgumentException("Token can only contain one number");
-        }
         switch (oper) {
             case reciproc:
                 operation = (a) -> 1 / a;
@@ -117,9 +110,8 @@ public class MathParser {
                 operation = (a, b) -> a * b;
                 break;
             case "/":
-                if (num2 == 0) {
+                if (num2 == 0)
                     throw new IllegalArgumentException("Divide by Zero Error");
-                }
                 operation = (a, b) -> a / b;
                 break;
         }
