@@ -1,6 +1,7 @@
 package com.lejtman;
 
 import java.awt.BorderLayout;
+import java.awt.Font;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -12,12 +13,13 @@ public class CalculatorDisplay extends JPanel {
 
     public CalculatorDisplay() {
         topDisplay = new JLabel(" ");
-        entryDisplay = new JLabel(" ");
+        entryDisplay = new JLabel("0");
+        entryDisplay.setFont(new Font(entryDisplay.getFont().getName(), Font.BOLD, 20));
         this.setLayout(new BorderLayout());
         this.add(topDisplay, BorderLayout.NORTH);
         this.add(entryDisplay, BorderLayout.CENTER);
         this.setVisible(true);
-        state = EntryState.ENTRY;
+        state = EntryState.MID_CALC;
     }
 
     public void setMidCalc(String s) {
@@ -33,7 +35,7 @@ public class CalculatorDisplay extends JPanel {
     public void submitToTopDisplay(String s) {
         if (state == EntryState.ANSWER)
             clearScreens();
-        if(s.startsWith("-"))
+        if (s.startsWith("-"))
             s = String.format("(%s)", s);
         addToDisplay(topDisplay, s);
     }
@@ -63,12 +65,12 @@ public class CalculatorDisplay extends JPanel {
     public void clearScreens() {
         clearDisplay(topDisplay);
         clearEntryDisplay();
-        state = EntryState.ENTRY;
+        //  state = EntryState.ENTRY;
     }
 
     public void clearEntryDisplay() {
-        clearDisplay(entryDisplay);
-        state = EntryState.ENTRY;
+        setMidCalc("0");
+        // state = EntryState.ENTRY;
     }
 
     private void clearDisplay(JLabel label) {
@@ -81,7 +83,7 @@ public class CalculatorDisplay extends JPanel {
         String entryText = entryDisplay.getText();
         //check that doesnt go to zero and collapse line
         if (entryText.length() <= 1)
-            entryDisplay.setText(" ");
+            setMidCalc("0");
         else
             entryDisplay.setText(entryText.substring(0, entryText.length() - 1));
     }

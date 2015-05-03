@@ -25,14 +25,12 @@ public class Calculator extends JFrame {
         buttonPad = new JPanel(new BorderLayout());
         operatorPad = new JPanel(new GridLayout(5, 1));
         advancedOperatorPad = new JPanel(new GridLayout(6, 1));
-      //  controlPad = new JPanel(new GridLayout(1, 4));
         memoryPad = new JPanel(new GridLayout(1, 4));
         numberPad = new JPanel(new GridLayout(4, 3));
         addButtons();
         buttonPad.add(numberPad, BorderLayout.CENTER);
         buttonPad.add(operatorPad, BorderLayout.EAST);
         buttonPad.add(advancedOperatorPad, BorderLayout.WEST);
-        //buttonPad.add(controlPad, BorderLayout.SOUTH);
         buttonPad.add(memoryPad, BorderLayout.NORTH);
         display = new CalculatorDisplay();
         this.add(display, BorderLayout.NORTH);
