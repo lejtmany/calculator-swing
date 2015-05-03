@@ -1,5 +1,6 @@
 
 import com.lejtman.MathParser;
+import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import junit.framework.Assert;
@@ -66,5 +67,12 @@ public class MathParserTests {
             MathParser.parse("9 4");
         }).isInstanceOf(IllegalArgumentException.class);
     }
+    
+    @Test
+    public void testParenthesesRegex() {
+        String testString = "(-76)/45+(-9)+6-90+(-89)";
+        System.out.println(Arrays.toString(testString.split("((?<!\\(-)(?<=[*+/-])|(?=[*+/-]))(?<!\\()")));
+    }
+    }
+        
 
-}

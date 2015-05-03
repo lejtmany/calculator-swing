@@ -12,10 +12,9 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-
 public class Calculator extends JFrame {
 
-    private final JPanel buttonPad;
+    private final JPanel buttonPad, numberPad, operatorPad, advancedOperatorPad, memoryPad;
     private String memory, lastOperation;
     private final CalculatorDisplay display;
 
@@ -23,9 +22,18 @@ public class Calculator extends JFrame {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setSize(500, 600);
         this.setLayout(new BorderLayout());
-        buttonPad = new JPanel();
+        buttonPad = new JPanel(new BorderLayout());
+        operatorPad = new JPanel(new GridLayout(5, 1));
+        advancedOperatorPad = new JPanel(new GridLayout(6, 1));
+      //  controlPad = new JPanel(new GridLayout(1, 4));
+        memoryPad = new JPanel(new GridLayout(1, 4));
+        numberPad = new JPanel(new GridLayout(4, 3));
         addButtons();
-        buttonPad.setLayout(new GridLayout(5, 5));
+        buttonPad.add(numberPad, BorderLayout.CENTER);
+        buttonPad.add(operatorPad, BorderLayout.EAST);
+        buttonPad.add(advancedOperatorPad, BorderLayout.WEST);
+        //buttonPad.add(controlPad, BorderLayout.SOUTH);
+        buttonPad.add(memoryPad, BorderLayout.NORTH);
         display = new CalculatorDisplay();
         this.add(display, BorderLayout.NORTH);
         this.add(buttonPad, BorderLayout.CENTER);
@@ -37,7 +45,7 @@ public class Calculator extends JFrame {
         //operator buttons
         String[] operators = {"+", "-", "*", "/"};
         for (String operator : operators) {
-            addButton(operator, new ActionListener() {
+            addButton(operatorPad, operator, new ActionListener() {
 
                 public void actionPerformed(ActionEvent e) {
 
@@ -54,7 +62,7 @@ public class Calculator extends JFrame {
 
         //numeric buttons
         for (int i = 0; i < 10; i++) {
-            addButton(i + "", new ActionListener() {
+            addButton(numberPad, i + "", new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     display.submitToEntryDisplay(e.getActionCommand());
@@ -62,7 +70,7 @@ public class Calculator extends JFrame {
             });
         }
 
-        addButton(".", new ActionListener() {
+        addButton(numberPad, ".", new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String entryText = display.getEntryDisplayText();
@@ -71,7 +79,7 @@ public class Calculator extends JFrame {
             }
         });
 
-        addButton("C", new ActionListener() {
+        addButton(advancedOperatorPad, "C", new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -81,7 +89,7 @@ public class Calculator extends JFrame {
             }
         });
 
-        addButton("CE", new ActionListener() {
+        addButton(advancedOperatorPad, "CE", new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -89,7 +97,7 @@ public class Calculator extends JFrame {
             }
         });
 
-        addButton("MS", new ActionListener() {
+        addButton(memoryPad, "MS", new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -97,7 +105,7 @@ public class Calculator extends JFrame {
             }
         });
 
-        addButton("MR", new ActionListener() {
+        addButton(memoryPad,"MR", new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -106,7 +114,7 @@ public class Calculator extends JFrame {
             }
         });
 
-        addButton("M+", new ActionListener() {
+        addButton(memoryPad,"M+", new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -114,7 +122,7 @@ public class Calculator extends JFrame {
             }
         });
 
-        addButton("M-", new ActionListener() {
+        addButton(memoryPad,"M-", new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -122,7 +130,7 @@ public class Calculator extends JFrame {
             }
         });
 
-        addButton("MC", new ActionListener() {
+        addButton(memoryPad,"MC", new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -131,7 +139,7 @@ public class Calculator extends JFrame {
         });
 
         //left arrow button
-        addButton("\u2190", new ActionListener() {
+        addButton(advancedOperatorPad, "\u2190", new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -140,7 +148,7 @@ public class Calculator extends JFrame {
         });
 
         //square root button
-        addButton("\u221A", new ActionListener() {
+        addButton(advancedOperatorPad, "\u221A", new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -150,7 +158,7 @@ public class Calculator extends JFrame {
             }
         });
 
-        addButton("%", new ActionListener() {
+        addButton(advancedOperatorPad, "%", new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -163,7 +171,7 @@ public class Calculator extends JFrame {
             }
         });
 
-        addButton("1/x", new ActionListener() {
+        addButton(advancedOperatorPad, "1/x", new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -174,7 +182,7 @@ public class Calculator extends JFrame {
         });
 
         //plus-minus sign
-        addButton("\u00B1", new ActionListener() {
+        addButton(numberPad, "\u00B1", new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -190,11 +198,11 @@ public class Calculator extends JFrame {
                 if (entryText.startsWith("-"))
                     display.setEntryDisplay(entryText.substring(1, entryText.length()));
                 else
-                    display.setEntryDisplay("-"+ entryText.trim());
+                    display.setEntryDisplay("-" + entryText.trim());
             }
         });
 
-        addButton("=", new ActionListener() {
+        addButton(operatorPad, "=", new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -216,6 +224,7 @@ public class Calculator extends JFrame {
                 display.appendToTopDisplay(lastOperation);
 
             }
+
         }
         );
 
@@ -231,9 +240,9 @@ public class Calculator extends JFrame {
         return (result.intValue() == result) ? result.intValue() + "" : result + "";
     }
 
-    private void addButton(String text, ActionListener listener) {
+    private void addButton(JPanel parent, String text, ActionListener listener) {
         JButton button = new JButton(text);
-        buttonPad.add(button);
+        parent.add(button);
         button.addActionListener(listener);
     }
 

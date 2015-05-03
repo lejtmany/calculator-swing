@@ -9,7 +9,6 @@ import java.util.regex.Pattern;
 
 public class MathParser {
 
-    //public final static String NEGATIVE_SIGN = "\u2212";
     private final static String sqrt = "sqrt";
     private final static String reciproc = "reciproc";
 
@@ -42,14 +41,15 @@ public class MathParser {
 
     private static List<String> tokenizeExpression(String expr) {
         List<String> tokenList = new LinkedList();
-        String[] tokenArray = expr.split("((?<=[*+/(?<!\\()-])|(?=[*+/(?<!\\()-]))");
+        String[] tokenArray = expr.split("((?<!\\(-)(?<=[*+/-])|(?=[*+/-]))(?<!\\()");
         for (String token : tokenArray) {
-            //token = token.replace(NEGATIVE_SIGN, "-");
             if (token.contains(sqrt))
                 token = doUnaryOperation(sqrt, token);
-            if (token.contains(reciproc))
+            else if (token.contains(reciproc))
                 token = doUnaryOperation(reciproc, token);
-           // tokenList.add(token.replaceFirst(NEGATIVE_SIGN, "-").trim());
+            else
+                //remove parentheses from negative numbers
+                token = token.replaceAll("[\\(\\)]", "");
             tokenList.add(token.trim());
         }
         return tokenList;
@@ -98,6 +98,7 @@ public class MathParser {
 
     private static double parseBinaryExpression(String operator, String n1, String n2) {
         BinaryOperator<Double> operation = null;
+
         double num1 = Double.parseDouble(n1), num2 = Double.parseDouble(n2);
         switch (operator) {
             case "+":
