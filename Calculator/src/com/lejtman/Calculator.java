@@ -214,10 +214,14 @@ public class Calculator extends JFrame {
             }
 
             private void appendLastOperation(String topText) {
-                String lastOperation = getLastRegex(topText, "[*+/-]");
+                String lastOperation = "";
+                Matcher m = Pattern.compile("[*+/-]").matcher(topText);
+                while (m.find()) {
+                    int start = m.start();
+                    lastOperation = topText.substring(m.start());
+                }
                 display.appendToTopDisplay(lastOperation);
             }
-
         }
         );
 
