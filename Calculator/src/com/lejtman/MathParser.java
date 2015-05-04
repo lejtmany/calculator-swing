@@ -57,26 +57,27 @@ public class MathParser {
 
     private static String doUnaryOperation(String oper, String token) {
         UnaryOperator<Double> operation = null;
-        Pattern numPattern = Pattern.compile("-?\\d+(\\.\\d+)?");
-        Matcher matcher = numPattern.matcher(token);
+        String betweenParentheses = getBetweenParentheses(token);
         double num = 0;
-        if (matcher.find())
-            num = Double.parseDouble(matcher.group());
-        else
-            throw new IllegalArgumentException("Token must contain a number");
-
-        //check that only one number in token
-        if (matcher.find())
-            throw new IllegalArgumentException("Token can only contain one number");
+        if(!betweenParentheses.matches("-?\\d+(\\.\\d+)?"))
+            betweenParentheses = doUnaryOperation(oper, betweenParentheses);
+        
+        num = Double.parseDouble(betweenParentheses);
         switch (oper) {
             case reciproc:
                 operation = (a) -> 1 / a;
                 break;
             case sqrt:
                 operation = (a) -> Math.sqrt(a);
-                break;
-        }
+                break;}
         return operation.apply(num) + "";
+    }
+    
+    private static String getBetweenParentheses(String s){
+        int firstOpening, lastClosing;
+        firstOpening = s.indexOf("(");
+        lastClosing = s.lastIndexOf(")");
+        return s.substring(firstOpening + 1, lastClosing);
     }
 
     private static double reciprocal(double num) {

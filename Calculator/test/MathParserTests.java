@@ -30,7 +30,7 @@ public class MathParserTests {
         double result = MathParser.parse(expr);
         Assert.assertEquals((double) 65, result);
     }
-    
+
     @Test
     public void testMatcher() {
         Pattern p = Pattern.compile("-?\\d+(\\.\\d+)?");
@@ -67,12 +67,10 @@ public class MathParserTests {
             MathParser.parse("9 4");
         }).isInstanceOf(IllegalArgumentException.class);
     }
-    
+
     @Test
     public void testParenthesesRegex() {
         String testString = "(-76)/45+(-9)+6-90+(-89)";
         System.out.println(Arrays.toString(testString.split("((?<!\\(-)(?<=[*+/-])|(?=[*+/-]))(?<!\\()")));
     }
-    }
-        
-
+}

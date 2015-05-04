@@ -49,13 +49,13 @@ public class CalculatorDisplay extends JPanel {
     public void submitToEntryDisplay(String s) {
         if (state == EntryState.ANSWER)
             clearScreens();
-        
+
         else if (state == EntryState.MID_CALC)
             clearEntryDisplay();
-        
-        if(entryDisplay.getText().matches("\\s*-?0\\s*"))
-            setEntryDisplay(entryDisplay.getText().contains("-") ? "-":"");
-        
+
+        if (entryDisplay.getText().matches("\\s*-?0\\s*"))
+            setEntryDisplay(entryDisplay.getText().contains("-") ? "-" : "");
+
         addToDisplay(entryDisplay, s);
         state = EntryState.ENTRY;
     }

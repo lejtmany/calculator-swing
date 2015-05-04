@@ -50,9 +50,9 @@ public class Calculator extends JFrame {
 
                 public void actionPerformed(ActionEvent e) {
                     //don't allow 2 operators in a row
-                    if(display.getState() == EntryState.MID_CALC)
+                    if (display.getState() == EntryState.MID_CALC)
                         return;
-                    
+
                     display.submitToTopDisplay(display.getEntryDisplayText());
 
                     //calculate what we have so far
@@ -154,11 +154,19 @@ public class Calculator extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String sqrtString = MathParser.sqrt(display.getEntryDisplayText());
-                display.submitToTopDisplay(String.format(sqrtString) + " ");
-                display.setMidCalc(MathParser.parse(sqrtString) + "");
+                display.setEntryDisplay(sqrtString + " ");
             }
         });
 
+         addButton(advancedOperatorPad, "1/x", new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String recipString = MathParser.reciproc(display.getEntryDisplayText());
+                display.setEntryDisplay(recipString + " ");
+            }
+        });
+        
         addButton(advancedOperatorPad, "%", new ActionListener() {
 
             @Override
@@ -167,18 +175,9 @@ public class Calculator extends JFrame {
                 display.setMidCalc(Double.parseDouble(lastEntry) * (Double.parseDouble(display.getEntryDisplayText()) * .01) + "");
                 display.submitToTopDisplay(display.getEntryDisplayText() + " ");
             }
-            
+
         });
 
-        addButton(advancedOperatorPad, "1/x", new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String recipString = MathParser.reciproc(display.getEntryDisplayText());
-                display.submitToTopDisplay(recipString);
-                display.setMidCalc(MathParser.parse(recipString) + "");
-            }
-        });
 
         //plus-minus sign
         addButton(numberPad, "\u00B1", new ActionListener() {
@@ -217,7 +216,7 @@ public class Calculator extends JFrame {
             private void appendLastOperation(String topText) {
                 String lastOperation = getLastRegex(topText, "[*+/-]");
                 display.appendToTopDisplay(lastOperation);
-            }            
+            }
 
         }
         );
@@ -238,14 +237,14 @@ public class Calculator extends JFrame {
     private static String doubleToString(Double result) {
         return (result.intValue() == result) ? result.intValue() + "" : result + "";
     }
-    
-    private String getLastRegex(String s, String regex){
-                String lastEntry = "";
-                Matcher m = Pattern.compile(regex).matcher(s);
-                if (m.find())
-                    lastEntry = m.group();
-                return lastEntry;
-            }
+
+    private String getLastRegex(String s, String regex) {
+        String lastEntry = "";
+        Matcher m = Pattern.compile(regex).matcher(s);
+        if (m.find())
+            lastEntry = m.group();
+        return lastEntry;
+    }
 
     private void addButton(JPanel parent, String text, ActionListener listener) {
         JButton button = new JButton(text);
