@@ -53,7 +53,7 @@ public class Calculator extends JFrame {
                     if (!display.getTopDisplayText().trim().isEmpty())
                         display.setMidCalc(solve(display.getTopDisplayText()));
 
-                    display.submitToTopDisplay(" " + e.getActionCommand());
+                    display.submitToTopDisplay(" " + e.getActionCommand() + " ");
                 }
             });
         }
@@ -151,7 +151,7 @@ public class Calculator extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String sqrtString = MathParser.sqrt(display.getEntryDisplayText());
-                display.submitToTopDisplay(String.format(sqrtString));
+                display.submitToTopDisplay(String.format(sqrtString) + " ");
                 display.setMidCalc(MathParser.parse(sqrtString) + "");
             }
         });
@@ -165,7 +165,7 @@ public class Calculator extends JFrame {
                 if (m.find())
                     lastEntry = m.group();
                 display.setMidCalc(Double.parseDouble(lastEntry) * (Double.parseDouble(display.getEntryDisplayText()) * .01) + "");
-                display.submitToTopDisplay(display.getEntryDisplayText());
+                display.submitToTopDisplay(display.getEntryDisplayText() + " ");
             }
         });
 
@@ -207,7 +207,7 @@ public class Calculator extends JFrame {
                 String topText = display.getTopDisplayText();
                 if (display.getState() == EntryState.ANSWER)
                     appendLastOperation(topText);
-                else
+                else if(display.getState() != EntryState.MID_CALC)
                     display.submitToTopDisplay(display.getEntryDisplayText());
 
                 display.setAnswer(solve(display.getTopDisplayText()));
@@ -234,6 +234,7 @@ public class Calculator extends JFrame {
             result = MathParser.parse(expr);
         } catch (Exception ex) {
             display.displayError("ERROR");
+            return " ";
         }
         return (result.intValue() == result) ? result.intValue() + "" : result + "";
     }

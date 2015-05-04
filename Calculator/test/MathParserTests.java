@@ -30,7 +30,7 @@ public class MathParserTests {
         double result = MathParser.parse(expr);
         Assert.assertEquals((double) 65, result);
     }
-
+    
     @Test
     public void testMatcher() {
         Pattern p = Pattern.compile("-?\\d+(\\.\\d+)?");

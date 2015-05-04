@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Font;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 
 public class CalculatorDisplay extends JPanel {
 
@@ -13,13 +14,14 @@ public class CalculatorDisplay extends JPanel {
 
     public CalculatorDisplay() {
         topDisplay = new JLabel(" ");
-        entryDisplay = new JLabel("0");
+        entryDisplay = new JLabel("0", SwingConstants.RIGHT);
         entryDisplay.setFont(new Font(entryDisplay.getFont().getName(), Font.BOLD, 20));
+        topDisplay.setFont(new Font(entryDisplay.getFont().getName(), Font.BOLD, 12));
         this.setLayout(new BorderLayout());
         this.add(topDisplay, BorderLayout.NORTH);
         this.add(entryDisplay, BorderLayout.CENTER);
         this.setVisible(true);
-        state = EntryState.MID_CALC;
+        state = EntryState.ENTRY;
     }
 
     public void setMidCalc(String s) {
@@ -36,7 +38,7 @@ public class CalculatorDisplay extends JPanel {
         if (state == EntryState.ANSWER)
             clearScreens();
         if (s.startsWith("-"))
-            s = String.format("(%s)", s);
+            s = String.format("(%s)", s.trim());
         addToDisplay(topDisplay, s);
     }
 
@@ -47,8 +49,13 @@ public class CalculatorDisplay extends JPanel {
     public void submitToEntryDisplay(String s) {
         if (state == EntryState.ANSWER)
             clearScreens();
+        
         else if (state == EntryState.MID_CALC)
             clearEntryDisplay();
+        
+        if(entryDisplay.getText().matches("\\s*-?0\\s*"))
+            setEntryDisplay(entryDisplay.getText().contains("-") ? "-":"");
+        
         addToDisplay(entryDisplay, s);
         state = EntryState.ENTRY;
     }
@@ -69,8 +76,8 @@ public class CalculatorDisplay extends JPanel {
     }
 
     public void clearEntryDisplay() {
-        setMidCalc("0");
-        // state = EntryState.ENTRY;
+        setEntryDisplay("0");
+        state = EntryState.ENTRY;
     }
 
     private void clearDisplay(JLabel label) {
