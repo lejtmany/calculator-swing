@@ -5,7 +5,6 @@ import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.text.DecimalFormat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.JButton;
@@ -50,12 +49,14 @@ public class Calculator extends JFrame {
             addButton(operatorPad, operator, new ActionListener() {
 
                 public void actionPerformed(ActionEvent e) {
+                    //don't allow 2 operators in a row
+                    if(display.getState() == EntryState.MID_CALC)
+                        return;
+                    
+                    display.submitToTopDisplay(display.getEntryDisplayText());
 
-                    if (display.getState() != EntryState.MID_CALC)
-                        display.submitToTopDisplay(display.getEntryDisplayText());
-
-                    if (!display.getTopDisplayText().trim().isEmpty())
-                        display.setMidCalc(solve(display.getTopDisplayText()));
+                    //calculate what we have so far
+                    display.setMidCalc(solve(display.getTopDisplayText()));
 
                     display.submitToTopDisplay(" " + e.getActionCommand() + " ");
                 }
@@ -162,13 +163,11 @@ public class Calculator extends JFrame {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                String lastEntry = "";
-                Matcher m = Pattern.compile("(-?\\d+(\\.\\d+)?)(?!.*\\d)").matcher(display.getTopDisplayText());
-                if (m.find())
-                    lastEntry = m.group();
+                String lastEntry = getLastRegex(display.getTopDisplayText(), "(-?\\d+(\\.\\d+)?)(?!.*\\d)");
                 display.setMidCalc(Double.parseDouble(lastEntry) * (Double.parseDouble(display.getEntryDisplayText()) * .01) + "");
                 display.submitToTopDisplay(display.getEntryDisplayText() + " ");
             }
+            
         });
 
         addButton(advancedOperatorPad, "1/x", new ActionListener() {
@@ -216,15 +215,9 @@ public class Calculator extends JFrame {
             }
 
             private void appendLastOperation(String topText) {
-                Matcher m = Pattern.compile("[*+/-]").matcher(topText);
-                String lastOperation = "";
-                while (m.find()) {
-                    int start = m.start();
-                    lastOperation = topText.substring(m.start());
-                }
+                String lastOperation = getLastRegex(topText, "[*+/-]");
                 display.appendToTopDisplay(lastOperation);
-
-            }
+            }            
 
         }
         );
@@ -245,6 +238,14 @@ public class Calculator extends JFrame {
     private static String doubleToString(Double result) {
         return (result.intValue() == result) ? result.intValue() + "" : result + "";
     }
+    
+    private String getLastRegex(String s, String regex){
+                String lastEntry = "";
+                Matcher m = Pattern.compile(regex).matcher(s);
+                if (m.find())
+                    lastEntry = m.group();
+                return lastEntry;
+            }
 
     private void addButton(JPanel parent, String text, ActionListener listener) {
         JButton button = new JButton(text);
