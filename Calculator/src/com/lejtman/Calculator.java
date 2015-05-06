@@ -3,6 +3,7 @@ package com.lejtman;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.regex.Matcher;
@@ -16,12 +17,13 @@ public class Calculator extends JFrame {
     private final JPanel buttonPad, numberPad, operatorPad, advancedOperatorPad, memoryPad;
     private double memory;
     private final CalculatorDisplay display;
+    ButtonGridAdder buttonAdder; 
 
     public Calculator() {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setSize(400, 500);
         this.setLayout(new BorderLayout());
 
+        buttonAdder = new ButtonGridAdder(5, 6);
         buttonPad = new JPanel(new BorderLayout());
         operatorPad = new JPanel(new GridLayout(5, 1));
         advancedOperatorPad = new JPanel(new GridLayout(6, 1));
@@ -30,23 +32,27 @@ public class Calculator extends JFrame {
         display = new CalculatorDisplay();
 
         addButtons();
+        buttonAdder.addButtonsTo(buttonPad);
 
-        buttonPad.add(numberPad, BorderLayout.CENTER);
+        buttonPad.add(numberPad, BorderLayout.WEST);
         buttonPad.add(operatorPad, BorderLayout.EAST);
-        buttonPad.add(advancedOperatorPad, BorderLayout.WEST);
+        buttonPad.add(advancedOperatorPad, BorderLayout.CENTER);
         buttonPad.add(memoryPad, BorderLayout.NORTH);
 
         this.add(display, BorderLayout.NORTH);
         this.add(buttonPad, BorderLayout.CENTER);
+        
         this.pack();
+        this.setSize(250, 300);       
         this.setVisible(true);
     }
 
     private void addButtons() {
         //operator buttons
+        Point[] operatorCoordinates = {new Point(3,2), new Point(3,3),new Point(3,4),new Point(3,5)};
         String[] operators = {"+", "-", "*", "/"};
-        for (String operator : operators) {
-            addButton(operatorPad, operator, new ActionListener() {
+        for (int i = 0; i < operators.length; i++) {
+            addButton(operatorPad, operators[i], new ActionListener() {
 
                 public void actionPerformed(ActionEvent e) {
                     //don't allow 2 operators in a row
@@ -60,17 +66,20 @@ public class Calculator extends JFrame {
 
                     display.submitToTopDisplay(" " + e.getActionCommand() + " ");
                 }
-            });
+            }, operatorCoordinates[i]);
         }
 
+        
+        
         //numeric buttons
+        Point[] numberCoordinates = {new Point(0,5), new Point(0,4),new Point(1,4),new Point(2,4),new Point(0,3),new Point(1,3),new Point(2,3),new Point(0,2),new Point(1,2),new Point(2,2)};
         for (int i = 0; i < 10; i++) {
             addButton(numberPad, i + "", new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     display.submitToEntryDisplay(e.getActionCommand());
                 }
-            });
+            }, numberCoordinates[i]);
         }
 
         addButton(numberPad, ".", new ActionListener() {
@@ -80,7 +89,7 @@ public class Calculator extends JFrame {
                 if (!entryText.contains(".") || display.getState() != EntryState.ENTRY)
                     display.submitToEntryDisplay(".");
             }
-        });
+        },new Point(5,2));
 
         addButton(advancedOperatorPad, "C", new ActionListener() {
 
@@ -89,7 +98,7 @@ public class Calculator extends JFrame {
                 display.clearScreens();
                 memory = 0;
             }
-        });
+        },new Point(2,1));
 
         addButton(advancedOperatorPad, "CE", new ActionListener() {
 
@@ -97,7 +106,7 @@ public class Calculator extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 display.clearEntryDisplay();
             }
-        });
+        },new Point(1,1));
 
         addButton(memoryPad, "MS", new ActionListener() {
 
@@ -105,7 +114,7 @@ public class Calculator extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 memory = Double.parseDouble(display.getEntryDisplayText());
             }
-        });
+        },new Point(2,0));
 
         addButton(memoryPad, "MR", new ActionListener() {
 
@@ -113,7 +122,7 @@ public class Calculator extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 display.setEntryDisplay(doubleToString(memory));
             }
-        });
+        },new Point(1,0));
 
         addButton(memoryPad, "M+", new ActionListener() {
 
@@ -121,7 +130,7 @@ public class Calculator extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 memory = memory + Double.parseDouble(display.getEntryDisplayText());
             }
-        });
+        },new Point(3,0));
 
         addButton(memoryPad, "M-", new ActionListener() {
 
@@ -137,7 +146,7 @@ public class Calculator extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 memory = 0;
             }
-        });
+        },new Point(4,0));
 
         //left arrow button
         addButton(advancedOperatorPad, "\u2190", new ActionListener() {
@@ -250,10 +259,15 @@ public class Calculator extends JFrame {
         return lastEntry;
     }
 
-    private void addButton(JPanel parent, String text, ActionListener listener) {
+    private void addButton(JPanel parent, String text, ActionListener listener, int col , int row) {
         JButton button = new JButton(text);
         parent.add(button);
         button.addActionListener(listener);
+        buttonAdder.addButton(button, col, row);
+    }
+    
+    private void addButton(JPanel parent, String text, ActionListener listener, Point coordinates){
+        addButton(parent, text, listener, coordinates.x, coordinates.y);
     }
 
     public static void main(String[] args) {
